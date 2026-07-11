@@ -1,6 +1,6 @@
 ---
 name: ship-spec
-description: Ship an approved spec on a dedicated branch through native tracker transitions, separate implementation commits, independent review gates, and a linked pull request.
+description: Ship an approved spec on a dedicated branch through native tracker transitions, separate implementation commits, independent review gates, and a linked draft pull request.
 disable-model-invocation: true
 ---
 
@@ -111,13 +111,13 @@ Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, ev
 
 For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`. Commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final `code-review` subagent from `<spec-base>`. Repeat until the whole-spec review passes.
 
-## 6. Publish the pull request
+## 6. Publish the draft pull request
 
 After the whole-spec review passes:
 
 1. Verify every work item has its own implementation commit and every remediation commit names its work item or parent spec.
 2. Push `<spec-branch>` to the repository remote.
-3. Create a pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head.
+3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
 4. Use the parent spec title for the pull-request title. Include implementation summary, test results, final review outcome, and native links to the parent spec and every child ticket in the body. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
 5. After pull-request creation succeeds, transition the parent spec to Done and keep `<tracker-user>` assigned. Reconcile every child ticket to Done and assigned to `<tracker-user>`.
 
@@ -135,6 +135,6 @@ Declare completion only when all conditions hold:
 - every implementation and remediation commit is included after `<spec-base>`;
 - every work item has a distinct implementation commit;
 - the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to Done through native tracker state;
-- the pull request targets `<base-branch>` from `<spec-branch>` and links the parent spec plus every child ticket.
+- the pull request remains a draft, targets `<base-branch>` from `<spec-branch>`, and links the parent spec plus every child ticket.
 
 Report the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final tests, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker and attempted remedies, obtain the smallest needed input, then resume this process.
