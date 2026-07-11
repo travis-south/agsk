@@ -50,16 +50,23 @@ Require a parent spec produced by `to-spec`. Child tickets produced by `to-ticke
 
 1. Resolve the parent spec from the invocation argument or current conversation. Fetch its full body and comments through the configured issue tracker.
 2. Verify the spec contains the `to-spec` sections and an approved testing seam. If no valid spec is available, ask the user to run `$to-spec`, then end the run.
-3. Resolve every child ticket from native child links, blocking links, or explicit parent references. Fetch each ticket's full body, comments, status, acceptance criteria, and blockers.
-4. Define the work items. Use each child ticket when children exist. When none exist, use the parent spec itself as one work item with no blockers.
-5. Build the work-item dependency graph. Reject missing tickets, cycles, unresolved blockers, or ambiguous parentage until corrected.
+3. Resolve every child ticket through an exhaustive **union**, never a first-success fallback:
+   - query the tracker's native child or sub-issue relationships;
+   - parse explicit child references from the parent body and comments;
+   - run a reverse-parent query across issues in every state, selecting tickets whose structured parent field resolves exactly to this parent.
+
+   For GitHub, the reverse-parent query must paginate `repos/<owner>/<repo>/issues?state=all&per_page=100` with `gh api --paginate`, exclude pull requests, and inspect every issue body. Search may narrow candidates, but cannot prove absence. Within a structured `## Parent` section, normalize a canonical issue URL, `owner/repo#<number>`, or same-repository `#<number>` to repository plus issue number before exact comparison. Mentions elsewhere in a body do not establish parentage. A zero-result native query does not establish that no children exist.
+
+   Union and deduplicate every validated result, then fetch each ticket's full body, comments, status, acceptance criteria, and blockers. Use blocking relationships only to build dependencies; they do not establish parentage.
+4. Define the work items only after every supported child-discovery source completes successfully. Use each child ticket when children exist. Use the parent spec itself as one work item with no blockers only when the exhaustive union is empty.
+5. Build the work-item dependency graph. Reject missing tickets, cycles, unresolved blockers, ambiguous parentage, or incomplete child discovery until corrected.
 6. Resolve `<tracker-user>` from the authenticated identity of the configured issue tracker. Use its native self-assignment or assignee field for the parent spec and every child ticket.
 7. Discover the tracker's native lifecycle. Prefer native status transitions equivalent to **In Progress** and **Done**. Otherwise use existing lifecycle labels; if only issue state exists, represent In Progress as open and Done as closed. Remove conflicting lifecycle values during each transition. Use the tracker-native mechanism instead of inventing parallel labels.
 8. Inspect the worktree. Preserve unrelated user work. Ask the user to isolate changes only when safe ticket commits and reviews cannot be separated from them.
 9. Record the current branch as `<base-branch>` and its current `HEAD` as `<spec-base>`. Create `<spec-branch>` from that exact commit, named `spec/<spec-id>-<short-slug>`. If the name exists, reuse it only when its history and tracker references prove it belongs to this spec and starts from `<spec-base>`; otherwise stop for a safe branch name.
 10. Assign the parent spec and every child ticket to `<tracker-user>`. Transition the parent spec to In Progress. Keep all implementation and review commits on `<spec-branch>`.
 
-Pass this gate only when the parent spec, exhaustive work-item set, dependency graph, tracker user, lifecycle mapping, base branch, spec base, and checked-out spec branch are known. A supported assignment or transition that fails is an external blocker; preserve state and stop before implementation.
+Pass this gate only when the parent spec, child-discovery sources queried and completed, validated and deduplicated exhaustive work-item set, dependency graph, tracker user, lifecycle mapping, base branch, spec base, and checked-out spec branch are known. A child-discovery, assignment, or transition operation that fails is an external blocker; preserve state and stop before implementation.
 
 ## 4. Work the frontier
 
