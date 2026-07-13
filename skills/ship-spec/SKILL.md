@@ -8,6 +8,12 @@ disable-model-invocation: true
 
 Drive one approved spec to completion. Keep the parent agent as orchestrator; give implementation and review to separate fresh subagents.
 
+Define `<terse-output-contract>` once and apply it to every human-readable artifact and message created by this run: tracker comments, commit messages, pull-request text, blocker reports, and completion reports.
+
+> Write concise, normal prose. State only the outcome, required evidence, and next action. Use short headings and bullets. Preserve required identifiers, links, test results, review outcomes, and blockers. Express context once at the narrowest useful level.
+
+Keep internal evidence exhaustive. Terseness changes presentation, not gates or legwork.
+
 ## 1. Gate on the Engineering skill set
 
 Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for every Matt Pocock skill under **Engineering**:
@@ -64,7 +70,7 @@ Require a parent spec produced by `to-spec`. Child tickets produced by `to-ticke
 7. Discover the tracker's native lifecycle. Prefer native status transitions equivalent to **In Progress** and **Done**. Otherwise use existing lifecycle labels; if only issue state exists, represent In Progress as open and Done as closed. Remove conflicting lifecycle values during each transition. Use the tracker-native mechanism instead of inventing parallel labels.
 8. Inspect the worktree. Preserve unrelated user work. Ask the user to isolate changes only when safe ticket commits and reviews cannot be separated from them.
 9. Record the current branch as `<base-branch>` and its current `HEAD` as `<spec-base>`. Create `<spec-branch>` from that exact commit, named `spec/<spec-id>-<short-slug>`. If the name exists, reuse it only when its history and tracker references prove it belongs to this spec and starts from `<spec-base>`; otherwise stop for a safe branch name.
-10. Define `<commit-contract>` for every implementation and remediation commit: use a commitlint-compatible Conventional Commit subject, `<type>(<scope>): <terse imperative summary>`. If `<spec-branch>` contains a Jira key matching `[A-Z][A-Z0-9]+-[0-9]+`, use that exact key as `<scope>` for every commit. Otherwise use a stable repository-relevant scope. Keep the subject concise and put evidence or detail in the body when needed.
+10. Define `<commit-contract>` for every implementation and remediation commit: apply `<terse-output-contract>` and use a commitlint-compatible Conventional Commit subject, `<type>(<scope>): <terse imperative summary>`. If `<spec-branch>` contains a Jira key matching `[A-Z][A-Z0-9]+-[0-9]+`, use that exact key as `<scope>` for every commit. Otherwise use a stable repository-relevant scope. Add a body only for required evidence, context, or links.
 11. Assign the parent spec and every child ticket to `<tracker-user>`. Transition the parent spec to In Progress. Keep all implementation and review commits on `<spec-branch>`.
 
 Pass this gate only when the parent spec, child-discovery sources queried and completed, validated and deduplicated exhaustive work-item set, dependency graph, tracker user, lifecycle mapping, base branch, spec base, checked-out spec branch, and commit contract are known. A child-discovery, assignment, or transition operation that fails is an external blocker; preserve state and stop before implementation.
@@ -124,7 +130,7 @@ After the whole-spec review passes:
 1. Verify every implementation and remediation commit satisfies `<commit-contract>`, every work item has its own implementation commit, and every remediation commit names its work item or parent spec.
 2. Push `<spec-branch>` to the repository remote.
 3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
-4. Use the parent spec title for the pull-request title. Include implementation summary, test results, final review outcome, and native links to the parent spec and every child ticket in the body. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
+4. Use the parent spec title for the pull-request title. Apply `<terse-output-contract>` to a short, structured body containing only the implementation summary, test results, final review outcome, and native links to the parent spec and every child ticket. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
 5. After pull-request creation succeeds, transition the parent spec to Done and keep `<tracker-user>` assigned. Reconcile every child ticket to Done and assigned to `<tracker-user>`.
 
 Keep the parent spec In Progress when branch push or pull-request creation fails. Preserve commits and report the exact retry point.
@@ -143,4 +149,4 @@ Declare completion only when all conditions hold:
 - the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to Done through native tracker state;
 - the pull request remains a draft, targets `<base-branch>` from `<spec-branch>`, and links the parent spec plus every child ticket.
 
-Report the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final tests, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker and attempted remedies, obtain the smallest needed input, then resume this process.
+Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final tests, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.
