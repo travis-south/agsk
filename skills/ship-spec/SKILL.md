@@ -10,7 +10,7 @@ Drive one approved spec to completion. Keep the parent agent as orchestrator; gi
 
 ## 1. Gate on the Engineering skill set
 
-Check the active harness's installed skill catalog for every Matt Pocock skill under **Engineering**:
+Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for every Matt Pocock skill under **Engineering**:
 
 - `ask-matt`
 - `code-review`
@@ -36,7 +36,7 @@ If any skill is missing, list the missing names and ask the user to run:
 npx skills@latest add mattpocock/skills
 ```
 
-Tell them to select every skill under **Engineering**, reload the harness, and invoke `$ship-spec` again. End the run here. Pass this gate only when the refreshed catalog contains the full set.
+Tell them to select every skill under **Engineering**, reload the harness, and invoke `$ship-spec` again. End the run here. Pass this gate only when the refreshed catalog union contains the full set.
 
 ## 2. Gate on repository setup
 
