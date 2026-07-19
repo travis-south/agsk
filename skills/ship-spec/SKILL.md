@@ -83,6 +83,10 @@ Define `<minimal-change-contract>` once and include it verbatim in every impleme
 
 > Choose the simplest correct implementation with the smallest change surface. Reuse existing code, patterns, and seams. Introduce an abstraction, dependency, configuration, or generalized behavior only when a binding requirement or verified constraint requires it. Explain why every changed file and new abstraction is necessary to the work item.
 
+Define `<simplicity-review-gate>` once and include it verbatim in every work-item and final-review subagent prompt. Review agents apply it as a blocking gate.
+
+> Fail review when a smaller change surface can satisfy the same binding requirements, tests, and deep-module boundaries. Report the exact deletion, reuse, inlining, or collapse. Pass only when no such simplification remains.
+
 Assign the selected work item to `<tracker-user>` and transition it to In Progress before implementation. The parent-spec work item is already In Progress.
 
 ### Implement
@@ -97,7 +101,7 @@ Wait for completion. Verify the distinct implementation commit exists on `<spec-
 
 Spawn a different fresh review subagent with `<work-item-base>`, the work item, the parent spec, repository instructions, and this brief:
 
-> Load and apply `code-review`. Apply `<minimal-change-contract>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec when present; otherwise use the parent spec. Apply all inherited parent-spec decisions. Return the Standards and Spec reports separately, plus the exact actionable findings and minimal-change accounting.
+> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec when present; otherwise use the parent spec. Apply all inherited parent-spec decisions. Return the Standards and Spec reports separately, plus the exact actionable findings and minimal-change accounting.
 
 Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
 
@@ -110,6 +114,7 @@ Mark the work item complete only after:
 - all implementation and review-fix work is committed;
 - Standards has no documented violation;
 - Spec has no missing, partial, wrong, or scope-crept behavior;
+- `<simplicity-review-gate>` passes;
 - every changed file and new abstraction is necessary to satisfy a binding requirement or verified constraint;
 - every smell is fixed or explicitly adjudicated.
 
@@ -119,9 +124,9 @@ For a child ticket, transition it to Done with the native lifecycle mechanism an
 
 Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, every child ticket when present, repository instructions, and this brief:
 
-> Load and apply `code-review`. Apply `<minimal-change-contract>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards and Spec separately, plus exact actionable findings and minimal-change accounting. This is the whole-spec release gate.
+> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards and Spec separately, plus exact actionable findings and minimal-change accounting. This is the whole-spec release gate.
 
-For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`. Apply `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final `code-review` subagent from `<spec-base>`. Repeat until the whole-spec review passes.
+For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`. Apply `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final `code-review` subagent from `<spec-base>`. Repeat until Standards, Spec, and `<simplicity-review-gate>` pass.
 
 ## 6. Publish the draft pull request
 
