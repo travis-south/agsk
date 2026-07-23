@@ -16,7 +16,7 @@ Keep internal evidence exhaustive. Terseness changes presentation, not gates or 
 
 ## 1. Gate on the Engineering skill set
 
-Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for every Matt Pocock skill under **Engineering**:
+Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for these Matt Pocock skills under **Engineering**:
 
 - `ask-matt`
 - `code-review`
@@ -24,17 +24,19 @@ Build the available-skill set by unioning every repository-local/project and glo
 - `diagnosing-bugs`
 - `domain-modeling`
 - `grill-with-docs`
+- `grill-me`
+- `grilling`
 - `implement`
 - `improve-codebase-architecture`
 - `prototype`
 - `research`
-- `resolving-merge-conflicts`
 - `setup-matt-pocock-skills`
 - `tdd`
 - `to-spec`
 - `to-tickets`
 - `triage`
 - `wayfinder`
+- `resolving-merge-conflicts`
 
 If any skill is missing, list the missing names and ask the user to run:
 
