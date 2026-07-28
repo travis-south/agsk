@@ -69,7 +69,7 @@ Require a parent spec produced by `to-spec`. Child tickets produced by `to-ticke
 4. Define the work items only after every supported child-discovery source completes successfully. Use each child ticket when children exist. Use the parent spec itself as one work item with no blockers only when the exhaustive union is empty.
 5. Build the work-item dependency graph. Reject missing tickets, cycles, unresolved blockers, ambiguous parentage, or incomplete child discovery until corrected.
 6. Resolve `<tracker-user>` from the authenticated identity of the configured issue tracker. Use its native self-assignment or assignee field for the parent spec and every child ticket.
-7. Discover the tracker's native lifecycle. Prefer native status transitions equivalent to **In Progress** and **Done**. Otherwise use existing lifecycle labels; if only issue state exists, represent In Progress as open and Done as closed. Remove conflicting lifecycle values during each transition. Use the tracker-native mechanism instead of inventing parallel labels.
+7. Discover the tracker's native lifecycle for the parent spec and every child ticket. Resolve **In Progress** and a `<review-handoff-state>` for each item. Choose the first native transition available from In Progress in this order: **Review** or **In Review**, **Testing** or **QA**, then **Done**. If native status transitions are unavailable, choose an existing lifecycle label in the same order; if only issue state exists, represent In Progress as open and `<review-handoff-state>` as closed. Remove conflicting lifecycle values during each transition. Use the tracker-native mechanism instead of inventing parallel labels.
 8. Inspect the worktree. Preserve unrelated user work. Ask the user to isolate changes only when safe ticket commits and reviews cannot be separated from them.
 9. Record the current branch as `<base-branch>` and its current `HEAD` as `<spec-base>`. Create `<spec-branch>` from that exact commit, named `spec/<spec-id>-<short-slug>`. If the name exists, reuse it only when its history and tracker references prove it belongs to this spec and starts from `<spec-base>`; otherwise stop for a safe branch name.
 10. Define `<commit-contract>` for every implementation and remediation commit: apply `<terse-output-contract>` and use a commitlint-compatible Conventional Commit subject, `<type>(<scope>): <terse imperative summary>`. If `<spec-branch>` contains a Jira key matching `[A-Z][A-Z0-9]+-[0-9]+`, use that exact key as `<scope>` for every commit. Otherwise use a stable repository-relevant scope. Add a body only for required evidence, context, or links.
@@ -79,7 +79,7 @@ Pass this gate only when the parent spec, child-discovery sources queried and co
 
 ## 4. Work the frontier
 
-Work one ready work item at a time. A work item is a child ticket or, when no children exist, the parent spec itself. A work item is ready when every blocker is complete. Re-read tracker status before choosing each work item.
+Work one ready work item at a time. A work item is a child ticket or, when no children exist, the parent spec itself. A work item is ready when every blocker is technically complete. Re-read tracker status before choosing each work item.
 
 Define `<minimal-change-contract>` once and include it verbatim in every implementation, `codebase-design`, `code-review`, remediation, and final-review subagent prompt. Implementation agents follow it; review agents treat any violation as blocking.
 
@@ -109,7 +109,7 @@ Treat documented-standard violations and missing, partial, wrong, or unrequested
 
 For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`, limited to the findings and work item. Apply `<commit-contract>` and commit review fixes separately with the same tracker reference, then spawn a different fresh `code-review` subagent against the same `<work-item-base>`. Repeat until the work-item review passes.
 
-Mark the work item complete only after:
+Mark the work item technically complete only after:
 
 - every applicable requirement or acceptance criterion has evidence;
 - required tests pass;
@@ -120,7 +120,7 @@ Mark the work item complete only after:
 - every changed file and new abstraction is necessary to satisfy a binding requirement or verified constraint;
 - every smell is fixed or explicitly adjudicated.
 
-For a child ticket, transition it to Done with the native lifecycle mechanism and keep `<tracker-user>` assigned. For the parent-spec work item, retain the passing implementation and review evidence while the parent stays In Progress until pull-request creation. Refresh the dependency graph and take the next frontier work item. Continue until every work item is complete.
+For a child ticket, transition it to its `<review-handoff-state>` with the native lifecycle mechanism and keep `<tracker-user>` assigned. For the parent-spec work item, retain the passing implementation and review evidence while the parent stays In Progress until pull-request creation. Refresh the dependency graph and take the next frontier work item. Continue until every work item is technically complete.
 
 ## 5. Review the whole spec
 
@@ -138,7 +138,7 @@ After the whole-spec review passes:
 2. Push `<spec-branch>` to the repository remote.
 3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
 4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Apply `<terse-output-contract>` to a short, structured body containing only the implementation summary, test results, final review outcome, and native links to the parent spec and every child ticket. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
-5. After pull-request creation succeeds, transition the parent spec to Done and keep `<tracker-user>` assigned. Reconcile every child ticket to Done and assigned to `<tracker-user>`.
+5. After pull-request creation succeeds, transition the parent spec to its `<review-handoff-state>` and keep `<tracker-user>` assigned. Reconcile every child ticket to its `<review-handoff-state>` and assigned to `<tracker-user>`.
 
 Keep the parent spec In Progress when branch push or pull-request creation fails. Preserve commits and report the exact retry point.
 
@@ -146,14 +146,14 @@ Keep the parent spec In Progress when branch push or pull-request creation fails
 
 Declare completion only when all conditions hold:
 
-- every work item is complete, including the parent-spec work item when no child tickets exist;
+- every work item is technically complete, including the parent-spec work item when no child tickets exist;
 - the dependency graph has no unfinished node;
 - the full required test suite passes at final `HEAD`;
 - the worktree contains no unaccounted changes;
 - the whole-spec Standards and Spec reviews pass;
 - every implementation and remediation commit is included after `<spec-base>` and satisfies `<commit-contract>`;
 - every work item has a distinct implementation commit;
-- the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to Done through native tracker state;
+- the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to their `<review-handoff-state>` through the tracker-native lifecycle mechanism;
 - the pull-request title satisfies the subject format defined by `<commit-contract>`, and the pull request remains a draft, targets `<base-branch>` from `<spec-branch>`, and links the parent spec plus every child ticket.
 
 Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final tests, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.
