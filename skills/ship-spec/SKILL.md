@@ -89,27 +89,7 @@ Define `<simplicity-review-gate>` once and include it verbatim in every work-ite
 
 > Fail review when a smaller change surface can satisfy the same binding requirements, tests, and deep-module boundaries. Report the exact deletion, reuse, inlining, or collapse. Pass only when no such simplification remains.
 
-Assign the selected work item to `<tracker-user>` and transition it to In Progress before implementation. The parent-spec work item is already In Progress.
-
-### Implement
-
-Record `<work-item-base>` as the current `HEAD`. Spawn a fresh implementation subagent with the full work item, parent spec reference, repository instructions, and this brief:
-
-> Implement this work item. Load and apply `implement` and `codebase-design`. Apply `<minimal-change-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and the full required suite at completion. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, minimal-change accounting, tests run with results, and blockers.
-
-Wait for completion. Verify the distinct implementation commit exists on `<spec-branch>`, satisfies `<commit-contract>`, references the work item, contains no other work item, the reported checks passed, every applicable requirement or acceptance criterion has evidence, every changed file and new abstraction is necessary, and no unrelated changes entered the commit.
-
-### Review
-
-Spawn a different fresh review subagent with `<work-item-base>`, the work item, the parent spec, repository instructions, and this brief:
-
-> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec when present; otherwise use the parent spec. Apply all inherited parent-spec decisions. Return the Standards and Spec reports separately, plus the exact actionable findings and minimal-change accounting.
-
-Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
-
-For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`, limited to the findings and work item. Apply `<commit-contract>` and commit review fixes separately with the same tracker reference, then spawn a different fresh `code-review` subagent against the same `<work-item-base>`. Repeat until the work-item review passes.
-
-Mark the work item technically complete only after:
+Define `<work-item-completion-gate>` once. It passes only when:
 
 - every applicable requirement or acceptance criterion has evidence;
 - required tests pass;
@@ -120,7 +100,29 @@ Mark the work item technically complete only after:
 - every changed file and new abstraction is necessary to satisfy a binding requirement or verified constraint;
 - every smell is fixed or explicitly adjudicated.
 
-For a child ticket, transition it to its `<review-handoff-state>` with the native lifecycle mechanism and keep `<tracker-user>` assigned. For the parent-spec work item, retain the passing implementation and review evidence while the parent stays In Progress until pull-request creation. Refresh the dependency graph and take the next frontier work item. Continue until every work item is technically complete.
+Assign the selected work item to `<tracker-user>` and transition it to In Progress before implementation. The parent-spec work item is already In Progress.
+
+### Implement
+
+Record `<work-item-base>` as the current `HEAD`. Spawn a fresh implementation subagent with the full work item, parent spec reference, repository instructions, and this brief:
+
+> Implement this work item. Load and apply `implement` and `codebase-design`. Apply `<minimal-change-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and the full required suite at completion. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, minimal-change accounting, tests run with results, and blockers.
+
+Wait for completion. Verify the distinct implementation commit exists on `<spec-branch>`, satisfies `<commit-contract>`, references the work item, contains no other work item, the reported checks passed, every applicable requirement or acceptance criterion has evidence, every changed file and new abstraction is necessary, and no unrelated changes entered the commit.
+
+When exhaustive child discovery is empty and the parent spec is the work item, proceed directly to section 5. Use the whole-spec review loop as the parent's sole independent review gate.
+
+### Review child tickets
+
+For a child-ticket work item, spawn a different fresh review subagent with `<work-item-base>`, the work item, the parent spec, repository instructions, and this brief:
+
+> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec and apply all inherited parent-spec decisions. Return the Standards and Spec reports separately, plus the exact actionable findings and minimal-change accounting.
+
+Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
+
+For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`, limited to the findings and work item. Apply `<commit-contract>` and commit review fixes separately with the same tracker reference, then spawn a different fresh `code-review` subagent against the same `<work-item-base>`. Repeat until the work-item review passes.
+
+After `<work-item-completion-gate>` passes, mark the child ticket technically complete, transition it to its `<review-handoff-state>` with the native lifecycle mechanism, and keep `<tracker-user>` assigned. Refresh the dependency graph and take the next frontier child ticket. Continue until every child ticket is technically complete.
 
 ## 5. Review the whole spec
 
@@ -129,6 +131,8 @@ Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, ev
 > Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards and Spec separately, plus exact actionable findings and minimal-change accounting. This is the whole-spec release gate.
 
 For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`. Apply `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final `code-review` subagent from `<spec-base>`. Repeat until Standards, Spec, and `<simplicity-review-gate>` pass.
+
+When the parent spec is the sole work item, continue this remediation and final-review loop until `<work-item-completion-gate>` also passes. Mark the parent technically complete, retaining In Progress until pull-request creation.
 
 ## 6. Publish the draft pull request
 
