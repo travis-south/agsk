@@ -14,7 +14,7 @@ Define `<terse-output-contract>` once and apply it to every human-readable artif
 
 Keep internal evidence exhaustive. Terseness changes presentation, not gates or legwork.
 
-## 1. Gate on the Engineering skill set
+## 1. Gate on required skills
 
 Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for these Matt Pocock skills under **Engineering**:
 
@@ -38,13 +38,29 @@ Build the available-skill set by unioning every repository-local/project and glo
 - `wayfinder`
 - `resolving-merge-conflicts`
 
-If any skill is missing, list the missing names and ask the user to run:
+Also require these Ponytail skills:
+
+- `ponytail`
+- `ponytail-review`
+
+Resolve every missing skill before stopping. If an Engineering skill is missing, list the missing names and ask the user to run:
 
 ```bash
 npx skills@latest add mattpocock/skills
 ```
 
-Tell them to select every skill under **Engineering**, reload the harness, and invoke `$ship-spec` again. End the run here. Pass this gate only when the refreshed catalog union contains the full set.
+Tell them to select every skill under **Engineering**.
+
+If a Ponytail skill is missing, list the missing names and direct the user to the [official installation instructions](https://github.com/DietrichGebert/ponytail#install) for the active harness. For Codex, ask them to run:
+
+```bash
+codex plugin marketplace add DietrichGebert/ponytail
+codex plugin add ponytail@ponytail
+```
+
+Tell them to review and trust the Ponytail hooks in `/hooks`.
+
+When either group has missing skills, report all relevant setup actions together, tell the user to restart the harness and invoke `$ship-spec` again, then end the run. Pass this gate only when the refreshed catalog union contains every Engineering and Ponytail skill above.
 
 ## 2. Gate on repository setup
 
@@ -81,13 +97,13 @@ Pass this gate only when the parent spec, child-discovery sources queried and co
 
 Work one ready work item at a time. A work item is a child ticket or, when no children exist, the parent spec itself. A work item is ready when every blocker is technically complete. Re-read tracker status before choosing each work item.
 
-Define `<minimal-change-contract>` once and include it verbatim in every implementation, `codebase-design`, `code-review`, remediation, and final-review subagent prompt. Implementation agents follow it; review agents treat any violation as blocking.
+Define `<ponytail-contract>` once and include it verbatim in every implementation, `codebase-design`, remediation, `code-review`, `ponytail-review`, and final-review subagent prompt.
 
-> Choose the simplest correct implementation with the smallest change surface. Reuse existing code, patterns, and seams. Introduce an abstraction, dependency, configuration, or generalized behavior only when a binding requirement or verified constraint requires it. Explain why every changed file and new abstraction is necessary to the work item.
+> Load and apply `ponytail` at `full` intensity. Treat the spec, acceptance criteria, repository standards, deep-module boundaries, approved testing seam, validation, error handling, security, and accessibility as binding constraints. Minimize the implementation within those constraints. Account for every changed file and new abstraction.
 
-Define `<simplicity-review-gate>` once and include it verbatim in every work-item and final-review subagent prompt. Review agents apply it as a blocking gate.
+Define `<ponytail-review-gate>` once and include it verbatim in every work-item and final-review subagent prompt.
 
-> Fail review when a smaller change surface can satisfy the same binding requirements, tests, and deep-module boundaries. Report the exact deletion, reuse, inlining, or collapse. Pass only when no such simplification remains.
+> Load and apply `ponytail-review` beside `code-review`. Treat every Ponytail finding as blocking. Pass only when Ponytail reports `Lean already. Ship.`
 
 Define `<work-item-completion-gate>` once. It passes only when:
 
@@ -96,7 +112,7 @@ Define `<work-item-completion-gate>` once. It passes only when:
 - all implementation and review-fix work is committed;
 - Standards has no documented violation;
 - Spec has no missing, partial, wrong, or scope-crept behavior;
-- `<simplicity-review-gate>` passes;
+- `<ponytail-review-gate>` passes;
 - every changed file and new abstraction is necessary to satisfy a binding requirement or verified constraint;
 - every smell is fixed or explicitly adjudicated.
 
@@ -106,7 +122,7 @@ Assign the selected work item to `<tracker-user>` and transition it to In Progre
 
 Record `<work-item-base>` as the current `HEAD`. Spawn a fresh implementation subagent with the full work item, parent spec reference, repository instructions, and this brief:
 
-> Implement this work item. Load and apply `implement` and `codebase-design`. Apply `<minimal-change-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and the full required suite at completion. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, minimal-change accounting, tests run with results, and blockers.
+> Implement this work item. Load and apply `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and the full required suite at completion. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, Ponytail accounting, tests run with results, and blockers.
 
 Wait for completion. Verify the distinct implementation commit exists on `<spec-branch>`, satisfies `<commit-contract>`, references the work item, contains no other work item, the reported checks passed, every applicable requirement or acceptance criterion has evidence, every changed file and new abstraction is necessary, and no unrelated changes entered the commit.
 
@@ -116,11 +132,11 @@ When exhaustive child discovery is empty and the parent spec is the work item, p
 
 For a child-ticket work item, spawn a different fresh review subagent with `<work-item-base>`, the work item, the parent spec, repository instructions, and this brief:
 
-> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec and apply all inherited parent-spec decisions. Return the Standards and Spec reports separately, plus the exact actionable findings and minimal-change accounting.
+> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec and apply all inherited parent-spec decisions. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting.
 
 Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
 
-For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`, limited to the findings and work item. Apply `<commit-contract>` and commit review fixes separately with the same tracker reference, then spawn a different fresh `code-review` subagent against the same `<work-item-base>`. Repeat until the work-item review passes.
+For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`, limited to the findings and work item. Apply `<ponytail-contract>` and `<commit-contract>`, commit review fixes separately with the same tracker reference, then spawn a different fresh review subagent using `code-review`, `ponytail`, and `ponytail-review` against the same `<work-item-base>`. Repeat until the work-item review passes.
 
 After `<work-item-completion-gate>` passes, mark the child ticket technically complete, transition it to its `<review-handoff-state>` with the native lifecycle mechanism, and keep `<tracker-user>` assigned. Refresh the dependency graph and take the next frontier child ticket. Continue until every child ticket is technically complete.
 
@@ -128,9 +144,9 @@ After `<work-item-completion-gate>` passes, mark the child ticket technically co
 
 Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, every child ticket when present, repository instructions, and this brief:
 
-> Load and apply `code-review`. Apply `<minimal-change-contract>` and `<simplicity-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards and Spec separately, plus exact actionable findings and minimal-change accounting. This is the whole-spec release gate.
+> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting. This is the whole-spec release gate.
 
-For blocking findings, spawn a fresh implementation subagent using `implement` and `codebase-design`. Apply `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final `code-review` subagent from `<spec-base>`. Repeat until Standards, Spec, and `<simplicity-review-gate>` pass.
+For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final review subagent using `code-review`, `ponytail`, and `ponytail-review` from `<spec-base>`. Repeat until Standards, Spec, and `<ponytail-review-gate>` pass.
 
 When the parent spec is the sole work item, continue this remediation and final-review loop until `<work-item-completion-gate>` also passes. Mark the parent technically complete, retaining In Progress until pull-request creation.
 
