@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ship Ticket"
+  short_description: "Ship one ticket through reviews and a draft PR"
+  default_prompt: "Use $ship-ticket to implement, review, and open a linked draft pull request for this ticket."
+policy:
+  allow_implicit_invocation: false
