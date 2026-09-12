@@ -1,6 +1,6 @@
 interface:
   display_name: "Ship Ponytail Ticket"
-  short_description: "Ship one ticket with Ponytail implementation and review"
+  short_description: "Ship one ticket with Ponytail and separate code review"
   default_prompt: "Use $ship-ponytail-ticket to implement, review, and open a linked draft pull request for this ticket."
 policy:
   allow_implicit_invocation: false

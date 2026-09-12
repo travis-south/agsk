@@ -1,23 +1,24 @@
 ---
 name: ship-ponytail-ticket
-description: Ship one assigned ticket on a dedicated branch through native tracker transitions, Ponytail implementation and review, commits, push, and a linked draft pull request.
+description: Ship one assigned ticket on a dedicated branch through native tracker transitions, Ponytail implementation, separate correctness and simplicity reviews, commits, push, and a linked draft pull request.
 disable-model-invocation: true
 ---
 
 # Ship Ponytail Ticket
 
-Drive one ticket to a reviewed draft pull request. Keep the parent agent as orchestrator. Give implementation, review, and every remediation to separate fresh subagents.
+Drive one ticket to a reviewed draft pull request. Keep the parent agent as orchestrator. Give implementation, each review, and every remediation to separate fresh subagents.
 
-## 1. Require the two skills
+## 1. Require the three skills
 
 Union every repository-local/project and global/user-installed skill folder or catalog exposed by the active harness. Match skill frontmatter names, not only directory names. Require exactly these workflow dependencies:
 
 - `ponytail`
 - `ponytail-review`
+- `code-review`
 
-If either is missing, report every missing name and its source group, then direct the user to the [official installation instructions](https://github.com/DietrichGebert/ponytail#install). Ask the user to restart the harness and invoke `$ship-ponytail-ticket` again after installation.
+If any are missing, report every missing name and its source group, then stop. For `code-review`, direct the user to `npx skills@latest add mattpocock/skills`. For Ponytail skills, direct the user to the [official installation instructions](https://github.com/DietrichGebert/ponytail#install). Ask the user to restart the harness and invoke `$ship-ponytail-ticket` again after installation.
 
-Continue only when the refreshed local-plus-global union contains both skills.
+Continue only when the refreshed local-plus-global union contains all three skills.
 
 ## 2. Pin the ticket, lifecycle, and branch
 
@@ -41,37 +42,45 @@ Wait for completion. Verify the commit exists on the ticket branch, follows the 
 
 ## 4. Review and remediate
 
-Run a fresh review against `<ticket-base>...HEAD`.
+Record `HEAD` as `<reviewed-head>`. Run the following read-only reviews in order against the full `<ticket-base>...<reviewed-head>` diff, keeping `<ticket-base>` fixed throughout the ticket.
 
 ### Ponytail review
 
-Spawn a fresh subagent with the ticket, repository instructions, fixed point, commit list, and diff:
+Spawn a fresh subagent with the ticket, repository instructions, fixed point, reviewed commit, commit list, and diff:
 
-> Load and apply `ponytail-review`. Review `<ticket-base>...HEAD` for unnecessary complexity. Return exact actionable findings. Pass only with `Lean already. Ship.`
+> Load and apply `ponytail-review`. Review `<ticket-base>...<reviewed-head>` for unnecessary complexity. Return exact actionable findings. Pass only with `Lean already. Ship.`
+
+### Correctness review
+
+After Ponytail review passes, spawn another fresh subagent with the full ticket and linked context, repository instructions, fixed point, reviewed commit, commit list, and diff:
+
+> Load and apply `code-review`. Review the full ticket diff against repository Standards and the full ticket Spec, using the skill's separate Standards and Spec subagents. Return both axes separately with exact actionable findings. Pass only when Standards has no documented violation and Spec has no missing, partial, wrong, or unrequested behavior.
 
 ### Remediation loop
 
-When the review reports an issue, spawn a fresh remediation subagent with the ticket, all current findings, repository instructions, fixed point, branch, and commit format:
+When either review reports an issue, spawn a fresh remediation subagent with the ticket, all current findings, repository instructions, fixed point, branch, and commit format:
 
 > Load and apply `ponytail` at full intensity. Fix only the reported findings with the smallest correct change. Keep ticket requirements and repository standards binding. Run focused checks and the full required suite. Commit the fixes separately on the ticket branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and test results.
 
-After any remediation, restart with a fresh `ponytail-review` subagent because the diff changed. Continue until a fresh review returns `Lean already. Ship.`
+Any subsequent ticket change invalidates both review results, including remediation, additional edits, and fixes during final verification or publication. Commit the changes separately, then restart this section from Ponytail review with fresh review subagents against the full ticket diff.
+
+The review gate passes only when correctness passes and Ponytail returns `Lean already. Ship.` for the same `<reviewed-head>`, `HEAD` still equals that commit, and all ticket changes are committed.
 
 ## 5. Push and open the draft pull request
 
-After the review passes:
+After the review gate in section 4 passes:
 
 1. Run the full required test suite at final `HEAD` and verify the worktree has no unaccounted changes.
 2. Verify every commit after `<ticket-base>` follows the commit format and belongs to the ticket.
-3. Push the ticket branch to the repository remote.
+3. Confirm the section 4 review gate still passes, then push the ticket branch to the repository remote.
 4. Open a draft pull request through the repository host's native mechanism, targeting `<base-branch>` from the ticket branch.
-5. Use the commit subject format for the pull-request title. Keep the body concise: implementation summary, tests, Ponytail Review result, and a native ticket link.
+5. Use the commit subject format for the pull-request title. Keep the body concise: implementation summary, tests, Standards result, Spec result, Ponytail result, and a native ticket link.
 6. After draft pull-request creation succeeds, keep `<executor>` assigned and transition the ticket to `<review-handoff-state>` through the tracker's native lifecycle mechanism.
 
 Keep the pull request in draft. Do not merge it. If push, pull-request creation, or the final tracker transition fails, preserve completed state, report the exact failure and retry point, then stop.
 
 ## 6. Complete
 
-Declare completion only when every ticket requirement has evidence, the full required suite passes at final `HEAD`, the worktree is accounted for, `ponytail-review` returns `Lean already. Ship.`, every ticket commit is pushed, the linked pull request is open in draft against `<base-branch>`, and the ticket remains assigned to `<executor>` in `<review-handoff-state>`.
+Declare completion only when every ticket requirement has evidence, the full required suite passes at final `HEAD`, the worktree is accounted for, the section 4 review gate passes at final `HEAD`, every ticket commit is pushed, the linked pull request is open in draft against `<base-branch>`, and the ticket remains assigned to `<executor>` in `<review-handoff-state>`.
 
-Report the ticket, executor, tracker transitions, branch, commit range, tests, Ponytail Review result, and draft pull-request link.
+Report the ticket, executor, tracker transitions, branch, commit range, tests, both review results, and draft pull-request link.
