@@ -3,4 +3,4 @@ interface:
   short_description: "Commit and push with terse tracker-scoped subjects"
   default_prompt: "Use $commit-and-push to commit and push the current Git changes."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

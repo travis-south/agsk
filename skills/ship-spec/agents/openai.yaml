@@ -3,4 +3,4 @@ interface:
   short_description: "Ship specs through commits, reviews, and PRs"
   default_prompt: "Use $ship-spec to implement, review, and open a linked pull request for this spec."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

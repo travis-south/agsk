@@ -1,7 +1,7 @@
 ---
 name: commit-and-push
 description: Check, commit, and push current Git changes with a branch-derived Conventional Commit scope.
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Commit and Push

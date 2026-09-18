@@ -1,7 +1,7 @@
 ---
 name: ship-spec
 description: Ship an approved spec on a dedicated branch through native tracker transitions, separate implementation commits, independent review gates, and a linked draft pull request.
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Ship Spec
