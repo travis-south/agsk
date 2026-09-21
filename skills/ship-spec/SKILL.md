@@ -10,7 +10,7 @@ Drive one approved spec to completion. Keep the parent agent as orchestrator; gi
 
 Define `<terse-output-contract>` once and apply it to every human-readable artifact and message created by this run: tracker comments, commit messages, pull-request text, blocker reports, and completion reports.
 
-> Write concise, normal prose. State only the outcome, required evidence, and next action. Use short headings and bullets. Preserve required identifiers, links, test results, review outcomes, and blockers. Express context once at the narrowest useful level.
+> Write concise, normal prose. State only the outcome, required evidence, and next action. Use short headings and bullets. Preserve required identifiers, links, validation results, review outcomes, and blockers. Express context once at the narrowest useful level.
 
 Keep internal evidence exhaustive. Terseness changes presentation, not gates or legwork.
 
@@ -108,7 +108,7 @@ Define `<ponytail-review-gate>` once and include it verbatim in every work-item 
 Define `<work-item-completion-gate>` once. It passes only when:
 
 - every applicable requirement or acceptance criterion has evidence;
-- required tests pass;
+- `<validation-contract>` passes;
 - all implementation and review-fix work is committed;
 - Standards has no documented violation;
 - Spec has no missing, partial, wrong, or scope-crept behavior;
@@ -118,11 +118,21 @@ Define `<work-item-completion-gate>` once. It passes only when:
 
 Assign the selected work item to `<tracker-user>` and transition it to In Progress before implementation. The parent-spec work item is already In Progress.
 
+### Full validation gate
+
+Before implementation, discover the full validation workflow from repository instructions, root and workspace manifests, task runners, scripts, and CI configuration. Inventory every available validation command, including tests, linters, formatters, type checks, builds, and any other repository checks. Use aggregate commands only after verifying they cover the inventory; run uncovered commands separately. Include every workspace and configured validation variant. Keep deployment, publishing, and other operational scripts outside this validation inventory.
+
+Define `<validation-contract>` from this inventory and the following requirements; include it verbatim in every implementation and remediation subagent prompt:
+
+> Refresh the inventory whenever validation scripts or configuration change. Run the entire validation inventory after implementation and after every subsequent change batch, including review fixes, manual edits, formatter output, and generated-file changes. Focused checks during development supplement this gate. If a command changes files, inspect the changes and rerun the entire workflow on the resulting state until all commands pass without further source changes. Return the exact commands, results, and validated commit SHA. Failed, unavailable, or skipped checks leave the gate blocked; report the blocker and retry point.
+
+The parent verifies this evidence after every implementation or remediation subagent returns and after any other changes, before starting the next review or work item. Any later change invalidates validation and affected review results: pass this gate, commit the changes, and repeat those reviews. Before publishing and declaring completion, require a passing full validation run for final `HEAD` with all changes accounted for.
+
 ### Implement
 
 Record `<work-item-base>` as the current `HEAD`. Spawn a fresh implementation subagent with the full work item, parent spec reference, repository instructions, and this brief:
 
-> Implement this work item. Load and apply `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and the full required suite at completion. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, Ponytail accounting, tests run with results, and blockers.
+> Implement this work item. Load and apply `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and pass `<validation-contract>` before handoff. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, Ponytail accounting, validation commands with results, and blockers.
 
 Wait for completion. Verify the distinct implementation commit exists on `<spec-branch>`, satisfies `<commit-contract>`, references the work item, contains no other work item, the reported checks passed, every applicable requirement or acceptance criterion has evidence, every changed file and new abstraction is necessary, and no unrelated changes entered the commit.
 
@@ -136,7 +146,7 @@ For a child-ticket work item, spawn a different fresh review subagent with `<wor
 
 Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
 
-For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`, limited to the findings and work item. Apply `<ponytail-contract>` and `<commit-contract>`, commit review fixes separately with the same tracker reference, then spawn a different fresh review subagent using `code-review`, `ponytail`, and `ponytail-review` against the same `<work-item-base>`. Repeat until the work-item review passes.
+For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`, limited to the findings and work item. Apply `<ponytail-contract>` and `<commit-contract>`, commit review fixes separately with the same tracker reference, pass `<validation-contract>`, then spawn a different fresh review subagent using `code-review`, `ponytail`, and `ponytail-review` against the same `<work-item-base>`. Repeat until the work-item review passes.
 
 After `<work-item-completion-gate>` passes, mark the child ticket technically complete, transition it to its `<review-handoff-state>` with the native lifecycle mechanism, and keep `<tracker-user>` assigned. Refresh the dependency graph and take the next frontier child ticket. Continue until every child ticket is technically complete.
 
@@ -146,7 +156,7 @@ Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, ev
 
 > Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting. This is the whole-spec release gate.
 
-For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`, commit focused fixes separately with the parent spec reference, run the full required suite, and spawn another fresh final review subagent using `code-review`, `ponytail`, and `ponytail-review` from `<spec-base>`. Repeat until Standards, Spec, and `<ponytail-review-gate>` pass.
+For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`, commit focused fixes separately with the parent spec reference, pass `<validation-contract>`, and spawn another fresh final review subagent using `code-review`, `ponytail`, and `ponytail-review` from `<spec-base>`. Repeat until Standards, Spec, and `<ponytail-review-gate>` pass.
 
 When the parent spec is the sole work item, continue this remediation and final-review loop until `<work-item-completion-gate>` also passes. Mark the parent technically complete, retaining In Progress until pull-request creation.
 
@@ -154,10 +164,10 @@ When the parent spec is the sole work item, continue this remediation and final-
 
 After the whole-spec review passes:
 
-1. Verify every implementation and remediation commit satisfies `<commit-contract>`, every work item has its own implementation commit, and every remediation commit names its work item or parent spec.
+1. Pass `<validation-contract>` at final `HEAD`. Verify every implementation and remediation commit satisfies `<commit-contract>`, every work item has its own implementation commit, and every remediation commit names its work item or parent spec.
 2. Push `<spec-branch>` to the repository remote.
 3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
-4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Apply `<terse-output-contract>` to a short, structured body containing only the implementation summary, test results, final review outcome, and native links to the parent spec and every child ticket. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
+4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Apply `<terse-output-contract>` to a short, structured body containing only the implementation summary, validation results, final review outcome, and native links to the parent spec and every child ticket. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
 5. After pull-request creation succeeds, transition the parent spec to its `<review-handoff-state>` and keep `<tracker-user>` assigned. Reconcile every child ticket to its `<review-handoff-state>` and assigned to `<tracker-user>`.
 
 Keep the parent spec In Progress when branch push or pull-request creation fails. Preserve commits and report the exact retry point.
@@ -168,7 +178,7 @@ Declare completion only when all conditions hold:
 
 - every work item is technically complete, including the parent-spec work item when no child tickets exist;
 - the dependency graph has no unfinished node;
-- the full required test suite passes at final `HEAD`;
+- the full validation workflow passes at final `HEAD`;
 - the worktree contains no unaccounted changes;
 - the whole-spec Standards and Spec reviews pass;
 - every implementation and remediation commit is included after `<spec-base>` and satisfies `<commit-contract>`;
@@ -176,4 +186,4 @@ Declare completion only when all conditions hold:
 - the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to their `<review-handoff-state>` through the tracker-native lifecycle mechanism;
 - the pull-request title satisfies the subject format defined by `<commit-contract>`, and the pull request remains a draft, targets `<base-branch>` from `<spec-branch>`, and links the parent spec plus every child ticket.
 
-Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final tests, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.
+Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final validation results, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.

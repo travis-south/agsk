@@ -37,9 +37,19 @@ Pass the resolved spec and input mode to every implementation, review, and remed
 
 ## 3. Implement
 
+### Full validation gate
+
+Before implementation, discover the full validation workflow from repository instructions, root and workspace manifests, task runners, scripts, and CI configuration. Inventory every available validation command, including tests, linters, formatters, type checks, builds, and any other repository checks. Use aggregate commands only after verifying they cover the inventory; run uncovered commands separately. Include every workspace and configured validation variant. Keep deployment, publishing, and other operational scripts outside this validation inventory.
+
+Define `<validation-contract>` from this inventory and the following requirements; include it verbatim in every implementation and remediation subagent prompt:
+
+> Refresh the inventory whenever validation scripts or configuration change. Run the entire validation inventory after implementation and after every subsequent change batch, including review fixes, manual edits, formatter output, and generated-file changes. Focused checks during development supplement this gate. If a command changes files, inspect the changes and rerun the entire workflow on the resulting state until all commands pass without further source changes. Return the exact commands, results, and validated commit SHA. Failed, unavailable, or skipped checks leave the gate blocked; report the blocker and retry point.
+
+The parent verifies this evidence after every implementation or remediation subagent returns and after any other changes, before starting the next review or work item. Any later change invalidates validation and affected review results: pass this gate, commit the changes, and repeat those reviews. Before publishing and declaring completion, require a passing full validation run for final `HEAD` with all changes accounted for.
+
 Spawn a fresh subagent with the full spec, linked context, repository instructions, `<work-base>`, branch, and commit format:
 
-> Load and apply `ponytail` at full intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Preserve validation, error handling, security, accessibility, and repository standards. Run focused checks during work and the full required suite at completion. Commit only this work item's implementation on the work branch. Return commit SHA, requirement evidence, changed-file accounting, tests with results, and blockers.
+> Load and apply `ponytail` at full intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Preserve validation, error handling, security, accessibility, and repository standards. Run focused checks during work and pass `<validation-contract>` before handoff. Commit only this work item's implementation on the work branch. Return commit SHA, requirement evidence, changed-file accounting, validation commands with results, and blockers.
 
 Wait for completion. Verify the commit exists on the work branch, follows the commit format, contains no unrelated work, and has evidence for every requirement. Stop on uncommitted or unaccounted changes.
 
@@ -63,7 +73,7 @@ After Ponytail review passes, spawn another fresh subagent with the full spec an
 
 When either review reports an issue, spawn a fresh remediation subagent with the spec, all current findings, repository instructions, fixed point, branch, and commit format:
 
-> Load and apply `ponytail` at full intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and repository standards binding. Run focused checks and the full required suite. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and test results.
+> Load and apply `ponytail` at full intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and repository standards binding. Run focused checks and pass `<validation-contract>` before handoff. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and validation results.
 
 Any subsequent work-item change invalidates both review results, including remediation, additional edits, and fixes during final verification or publication. Commit the changes separately, then restart this section from Ponytail review with fresh review subagents against the full work-item diff.
 
@@ -73,17 +83,17 @@ The review gate passes only when correctness passes and Ponytail returns `Lean a
 
 After the review gate in section 4 passes:
 
-1. Run the full required test suite at final `HEAD` and verify the worktree has no unaccounted changes.
+1. Run the full validation workflow at final `HEAD` and verify the worktree has no unaccounted changes.
 2. Verify every commit after `<work-base>` follows the commit format and belongs to the work item.
 3. Confirm the section 4 review gate still passes, then push the work branch to the repository remote.
 4. Open a draft pull request through the repository host's native mechanism, targeting `<base-branch>` from the work branch.
-5. Use the commit subject format for the pull-request title. Keep the body concise: implementation summary, tests, Standards result, Spec result, Ponytail result, and the spec source: a native ticket link for tracked work, or the requirement and acceptance criteria for prompt-only work.
+5. Use the commit subject format for the pull-request title. Keep the body concise: implementation summary, validation results, Standards result, Spec result, Ponytail result, and the spec source: a native ticket link for tracked work, or the requirement and acceptance criteria for prompt-only work.
 6. **Tracked tickets only:** after draft pull-request creation succeeds, keep `<executor>` assigned and transition the ticket to `<review-handoff-state>` through the tracker's native lifecycle mechanism.
 
 Keep the pull request in draft. Do not merge it. If push, pull-request creation, or an applicable final tracker transition fails, preserve completed state, report the exact failure and retry point, then stop.
 
 ## 6. Complete
 
-Declare completion only when every work-item requirement has evidence, the full required suite passes at final `HEAD`, the worktree is accounted for, the section 4 review gate passes at final `HEAD`, every work-item commit is pushed, the pull request is open in draft against `<base-branch>`, and, for tracked tickets, the ticket remains assigned to `<executor>` in `<review-handoff-state>`.
+Declare completion only when every work-item requirement has evidence, the full validation workflow passes at final `HEAD`, the worktree is accounted for, the section 4 review gate passes at final `HEAD`, every work-item commit is pushed, the pull request is open in draft against `<base-branch>`, and, for tracked tickets, the ticket remains assigned to `<executor>` in `<review-handoff-state>`.
 
-Report the work item, branch, commit range, tests, both review results, and draft pull-request link. Include executor and tracker transitions only for tracked tickets.
+Report the work item, branch, commit range, validation results, both review results, and draft pull-request link. Include executor and tracker transitions only for tracked tickets.
