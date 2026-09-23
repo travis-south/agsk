@@ -8,7 +8,7 @@ disable-model-invocation: false
 
 Drive one approved spec to completion. Keep the parent agent as orchestrator; give implementation and review to separate fresh subagents.
 
-Define `<terse-output-contract>` once and apply it to every human-readable artifact and message created by this run: tracker comments, commit messages, pull-request text, blocker reports, and completion reports.
+Define `<terse-output-contract>` once and apply it to tracker comments, commit messages, blocker reports, and completion reports. Pull-request text follows section 6.
 
 > Write concise, normal prose. State only the outcome, required evidence, and next action. Use short headings and bullets. Preserve required identifiers, links, validation results, review outcomes, and blockers. Express context once at the narrowest useful level.
 
@@ -167,7 +167,7 @@ After the whole-spec review passes:
 1. Pass `<validation-contract>` at final `HEAD`. Verify every implementation and remediation commit satisfies `<commit-contract>`, every work item has its own implementation commit, and every remediation commit names its work item or parent spec.
 2. Push `<spec-branch>` to the repository remote.
 3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
-4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Apply `<terse-output-contract>` to a short, structured body containing only the implementation summary, validation results, final review outcome, and native links to the parent spec and every child ticket. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
+4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Limit the body to a `Summary` of 1–3 short sentences: lead with why the change is needed, then explain the key decision and its rationale. Add native links to the parent spec and every child ticket. Omit change inventories, validation sections, and review sections. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
 5. After pull-request creation succeeds, transition the parent spec to its `<review-handoff-state>` and keep `<tracker-user>` assigned. Reconcile every child ticket to its `<review-handoff-state>` and assigned to `<tracker-user>`.
 
 Keep the parent spec In Progress when branch push or pull-request creation fails. Preserve commits and report the exact retry point.

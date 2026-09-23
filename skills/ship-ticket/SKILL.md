@@ -93,7 +93,7 @@ After both reviews pass:
 2. Verify every commit after `<work-base>` follows the commit format and belongs to the work item.
 3. Push the work branch to the repository remote.
 4. Open a draft pull request through the repository host's native mechanism, targeting `<base-branch>` from the work branch.
-5. Use the commit subject format for the pull-request title. Keep the body concise: implementation summary, validation results, Standards result, Spec result, Ponytail result, and the spec source: a native ticket link for tracked work, or the requirement and acceptance criteria for prompt-only work.
+5. Use the commit subject format for the pull-request title. Limit the body to a `Summary` of 1–3 short sentences: lead with why the change is needed, then explain the key decision and its rationale. Add a native ticket link for tracked work. Omit change inventories, validation sections, and review sections.
 6. **Tracked tickets only:** after draft pull-request creation succeeds, keep `<executor>` assigned and transition the ticket to `<review-handoff-state>` through the tracker's native lifecycle mechanism.
 
 Keep the pull request in draft. Do not merge it. If push, pull-request creation, or an applicable final tracker transition fails, preserve completed state, report the exact failure and retry point, then stop.
