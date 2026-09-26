@@ -5,6 +5,7 @@ Personal agent skills, installable with [skills.sh](https://skills.sh).
 ## Skills
 
 - `commit-and-push` — check, commit, and push current changes with a tracker-scoped commitlint subject.
+- `create-private-repo` — create a private GitHub repository named from its description and clone it to a chosen folder.
 - `ship-spec` — implement an approved spec on its own branch, update tracker state, independently review each work item, and open a draft pull request.
 - `ship-ticket` — implement one ticket or prompt-only requirement on its own branch, pass correctness and simplicity reviews, and open a draft pull request.
 - `ship-ponytail-ticket` — implement one ticket or prompt-only requirement using Ponytail, pass separate correctness and simplicity reviews, and open a draft pull request.
