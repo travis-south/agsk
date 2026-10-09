@@ -36,7 +36,6 @@ Build the available-skill set by unioning every repository-local/project and glo
 - `to-tickets`
 - `triage`
 - `wayfinder`
-- `resolving-merge-conflicts`
 
 Also require these Ponytail skills:
 
