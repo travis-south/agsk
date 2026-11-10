@@ -42,7 +42,7 @@ Also require these Ponytail skills:
 - `ponytail`
 - `ponytail-review`
 
-Resolve every missing skill before stopping. If an Engineering skill is missing, list the missing names and ask the user to run:
+If an Engineering skill is missing, list the missing names and ask the user to run:
 
 ```bash
 npx skills@latest add mattpocock/skills
@@ -96,9 +96,9 @@ Pass this gate only when the parent spec, child-discovery sources queried and co
 
 Work one ready work item at a time. A work item is a child ticket or, when no children exist, the parent spec itself. A work item is ready when every blocker is technically complete. Re-read tracker status before choosing each work item.
 
-Define `<ponytail-contract>` once and include it verbatim in every implementation, `codebase-design`, remediation, `code-review`, `ponytail-review`, and final-review subagent prompt.
+Define `<ponytail-contract>` once and include it verbatim in every implementation, remediation, work-item review, and final-review subagent prompt.
 
-> Load and apply `ponytail` at `full` intensity. Treat the spec, acceptance criteria, repository standards, deep-module boundaries, approved testing seam, validation, error handling, security, and accessibility as binding constraints. Minimize the implementation within those constraints. Account for every changed file and new abstraction.
+> Load and apply `ponytail` at `ultra` intensity. Treat the spec, acceptance criteria, repository standards, deep-module boundaries, approved testing seam, validation, error handling, security, and accessibility as binding constraints. Minimize the implementation within those constraints. Report ultra pushback in the return and keep every binding constraint. Account for every changed file and new abstraction.
 
 Define `<ponytail-review-gate>` once and include it verbatim in every work-item and final-review subagent prompt.
 
@@ -131,7 +131,7 @@ The parent verifies this evidence after every implementation or remediation suba
 
 Record `<work-item-base>` as the current `HEAD`. Spawn a fresh implementation subagent with the full work item, parent spec reference, repository instructions, and this brief:
 
-> Implement this work item. Load and apply `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and pass `<validation-contract>` before handoff. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, Ponytail accounting, validation commands with results, and blockers.
+> Implement this work item. Load and apply `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`. Treat its acceptance criteria, when present, and the parent spec as binding. Preserve deep-module boundaries and use the agreed testing seam. Run focused checks during work and pass `<validation-contract>` before handoff. Create a distinct implementation commit for this work item on `<spec-branch>` and reference its tracker identifier in the commit body when it is not already the commit scope. Keep other work items out of that commit. Scope ends at committed implementation plus evidence; independent review belongs to another agent. Return commit SHA(s), requirement evidence, ultra pushback, Ponytail accounting, validation commands with results, and blockers.
 
 Wait for completion. Verify the distinct implementation commit exists on `<spec-branch>`, satisfies `<commit-contract>`, references the work item, contains no other work item, the reported checks passed, every applicable requirement or acceptance criterion has evidence, every changed file and new abstraction is necessary, and no unrelated changes entered the commit.
 
@@ -179,7 +179,7 @@ Declare completion only when all conditions hold:
 - the dependency graph has no unfinished node;
 - the full validation workflow passes at final `HEAD`;
 - the worktree contains no unaccounted changes;
-- the whole-spec Standards and Spec reviews pass;
+- the whole-spec Standards and Spec reviews and `<ponytail-review-gate>` pass;
 - every implementation and remediation commit is included after `<spec-base>` and satisfies `<commit-contract>`;
 - every work item has a distinct implementation commit;
 - the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to their `<review-handoff-state>` through the tracker-native lifecycle mechanism;

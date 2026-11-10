@@ -57,7 +57,7 @@ The parent verifies this evidence after every implementation or remediation suba
 
 Spawn a fresh subagent with the full spec, linked context, repository instructions, `<work-base>`, branch, and commit format:
 
-> Load and apply `implement`, `codebase-design`, and `ponytail` at full intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Preserve validation, error handling, security, accessibility, and repository standards. Run focused checks during work and pass `<validation-contract>` before handoff. Commit only this work item's implementation on the work branch. End before `implement`'s review handoff; the parent orchestrator will give that review to a fresh agent. Return commit SHA, requirement evidence, changed-file accounting, validation commands with results, and blockers.
+> Load and apply `implement`, `codebase-design`, and `ponytail` at ultra intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Preserve validation, error handling, security, accessibility, and repository standards. Run focused checks during work and pass `<validation-contract>` before handoff. Commit only this work item's implementation on the work branch. End before `implement`'s review handoff; the parent orchestrator will give that review to a fresh agent. Report ultra pushback in the return and keep every requirement binding. Return commit SHA, requirement evidence, ultra pushback, changed-file accounting, validation commands with results, and blockers.
 
 Wait for completion. Verify the commit exists on the work branch, follows the commit format, contains no unrelated work, and has evidence for every requirement. Stop on uncommitted or unaccounted changes.
 
@@ -81,7 +81,7 @@ After correctness passes, spawn another fresh subagent with the diff and this br
 
 When either review reports an issue, spawn a fresh remediation subagent with the spec, all current findings, repository instructions, fixed point, branch, and commit format:
 
-> Load and apply `implement`, `codebase-design`, and `ponytail` at full intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and repository standards binding. Run focused checks and pass `<validation-contract>` before handoff. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and validation results.
+> Load and apply `implement`, `codebase-design`, and `ponytail` at ultra intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and repository standards binding. Run focused checks and pass `<validation-contract>` before handoff. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and validation results.
 
 After any remediation, restart with a fresh correctness-review subagent because the diff changed. Continue until correctness passes and a later fresh simplicity review returns `Lean already. Ship.`
 
