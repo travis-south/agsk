@@ -16,7 +16,7 @@ Keep internal evidence exhaustive. Terseness changes presentation, not gates or 
 
 ## 1. Gate on required skills
 
-Build the available-skill set by unioning every repository-local/project and global/user-installed catalog exposed by the active harness. Check that set for these Matt Pocock skills under **Engineering**:
+Build the available-skill set by unioning every repository-local/project and global/user-installed skill folder or catalog exposed by the active harness. Match skill frontmatter names, not only directory names. Check that set for these Matt Pocock skills under **Engineering**:
 
 - `ask-matt`
 - `code-review`
