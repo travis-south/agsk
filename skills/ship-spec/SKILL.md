@@ -72,7 +72,7 @@ Pass this gate only when the repository instruction file contains its `## Agent 
 Require a parent spec produced by `to-spec`. Child tickets produced by `to-tickets` are optional.
 
 1. Resolve the parent spec from the invocation argument or current conversation. Fetch its full body and comments through the configured issue tracker.
-2. Verify the spec contains the `to-spec` sections and an approved testing seam. If no valid spec is available, ask the user to run `$to-spec`, then end the run.
+2. Verify the spec contains the `to-spec` Problem Statement, Solution, Implementation Decisions, Testing Decisions, Out of Scope, and Further Notes sections, plus an approved testing seam. If no valid spec is available, ask the user to run `$to-spec`, then end the run.
 3. Resolve every child ticket through an exhaustive **union**, never a first-success fallback:
    - query the tracker's native child or sub-issue relationships;
    - parse explicit child references from the parent body and comments;
