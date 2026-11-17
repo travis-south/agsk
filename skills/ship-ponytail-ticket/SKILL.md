@@ -25,15 +25,15 @@ Continue only when the refreshed local-plus-global union contains all three skil
 1. Resolve the work item from the invocation argument or current conversation:
    - **Tracked ticket:** when the user supplies a ticket reference as the work item, fetch its full body, comments, acceptance criteria, and linked context through its tracker. Stop if the ticket is ambiguous, retrieval fails, the ticket is blocked, or its requirements lack enough detail to implement safely; switching to prompt-only work requires the user's direction.
    - **Prompt-only:** use the supplied requirement and relevant conversation as the spec. State its scope and checkable acceptance criteria without adding requirements. Proceed when these are clear; ask only for missing details that prevent safe implementation. This mode needs no issue, tracker configuration, authenticated tracker identity, or tracker operations.
-2. Read repository instructions and inspect the relevant code paths. Preserve unrelated work. Ask the user to isolate changes only when the work item cannot be committed and reviewed independently.
+2. Read repository instructions and inspect the relevant code paths. Record every coding-standards and architecture doc the repository keeps as `<standards-docs>`: files such as `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, ADRs, and docs the repository instructions point to; an empty list is valid. Preserve unrelated work. Ask the user to isolate changes only when the work item cannot be committed and reviewed independently.
 3. Record the current branch as `<base-branch>` and its current `HEAD` as `<work-base>`.
 4. Create and check out a dedicated branch from `<work-base>`, following repository or harness naming rules; otherwise use `feat/<ticket-id>-<short-slug>` for tracked tickets or `feat/<short-slug>` for prompt-only work. Reuse an existing branch only when its history and work-item context prove it belongs to this work and starts from `<work-base>`.
 5. Define the commit subject as `<type>(<scope>): <terse imperative summary>`. Use a Jira key from a tracked ticket as `<scope>`; otherwise use a stable repository-relevant scope. Keep required evidence and any ticket link in the body.
 6. **Tracked tickets only:** resolve `<executor>` from the tracker's authenticated identity and discover its native lifecycle. Resolve In Progress and `<review-handoff-state>`; prefer Review or In Review, then Testing or QA, then Done. Use existing native statuses or lifecycle labels; when only open/closed state exists, use open for In Progress and closed for handoff. Assign the ticket to `<executor>`, then transition it to In Progress. Stop before implementation if assignment or transition fails.
 
-Continue only when the spec, acceptance criteria, repository rules, clean change boundary, base branch, work base, work branch, and commit format are known, plus confirmed assignment, lifecycle mapping, and In Progress transition for tracked tickets.
+Continue only when the spec, acceptance criteria, repository rules, `<standards-docs>`, clean change boundary, base branch, work base, work branch, and commit format are known, plus confirmed assignment, lifecycle mapping, and In Progress transition for tracked tickets.
 
-Pass the resolved spec and input mode to every implementation, review, and remediation subagent. For prompt-only work, this spec replaces downstream skills' tracker setup and issue lookup steps, including `code-review`'s requirement for `docs/agents/issue-tracker.md`. Review the supplied spec directly and run both Standards and Spec axes.
+Pass the resolved spec, input mode, and `<standards-docs>` to every implementation, review, and remediation subagent. For prompt-only work, this spec replaces downstream skills' tracker setup and issue lookup steps, including `code-review`'s requirement for `docs/agents/issue-tracker.md`. Review the supplied spec directly and run both Standards and Spec axes.
 
 ## 3. Implement
 
@@ -49,7 +49,7 @@ The parent verifies this evidence after every implementation or remediation suba
 
 Spawn a fresh subagent with the full spec, linked context, repository instructions, `<work-base>`, branch, and commit format:
 
-> Load and apply `ponytail` at ultra intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Preserve validation, error handling, security, accessibility, and repository standards. Run focused checks during work and pass `<validation-contract>` before handoff. Commit only this work item's implementation on the work branch. Report ultra pushback in the return and keep every requirement binding. Return commit SHA, requirement evidence, ultra pushback, changed-file accounting, validation commands with results, and blockers.
+> Load and apply `ponytail` at ultra intensity. Implement every work-item requirement and acceptance criterion with the smallest correct change at the existing seam. Follow `<standards-docs>`, and preserve validation, error handling, security, and accessibility. Run focused checks during work and pass `<validation-contract>` before handoff. Commit only this work item's implementation on the work branch. Report ultra pushback in the return and keep every requirement binding. Return commit SHA, requirement evidence, ultra pushback, changed-file accounting, validation commands with results, and blockers.
 
 Wait for completion. Verify the commit exists on the work branch, follows the commit format, contains no unrelated work, and has evidence for every requirement. Stop on uncommitted or unaccounted changes.
 
@@ -61,19 +61,19 @@ Record `HEAD` as `<reviewed-head>`. Run the following read-only reviews in order
 
 Spawn a fresh subagent with the spec, repository instructions, fixed point, reviewed commit, commit list, and diff:
 
-> Load and apply `ponytail-review`. Review `<work-base>...<reviewed-head>` for unnecessary complexity. Return exact actionable findings. Pass only with `Lean already. Ship.`
+> Load and apply `ponytail-review`. Review `<work-base>...<reviewed-head>` for unnecessary complexity, treating `<standards-docs>` as binding. Return exact actionable findings. Pass only with `Lean already. Ship.`
 
 ### Correctness review
 
 After Ponytail review passes, spawn another fresh subagent with the full spec and linked context, repository instructions, fixed point, reviewed commit, commit list, and diff:
 
-> Load and apply `code-review`. Review the full work-item diff against repository Standards and the full supplied spec, using the skill's separate Standards and Spec subagents. Return both axes separately with exact actionable findings. Pass only when Standards has no documented violation and Spec has no missing, partial, wrong, or unrequested behavior.
+> Load and apply `code-review`. Review the full work-item diff against repository Standards, with every `<standards-docs>` file among the Standards sources, and the full supplied spec, using the skill's separate Standards and Spec subagents. Return both axes separately with exact actionable findings. Pass only when Standards has no documented violation and Spec has no missing, partial, wrong, or unrequested behavior.
 
 ### Remediation loop
 
 When either review reports an issue, spawn a fresh remediation subagent with the spec, all current findings, repository instructions, fixed point, branch, and commit format:
 
-> Load and apply `ponytail` at ultra intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and repository standards binding. Run focused checks and pass `<validation-contract>` before handoff. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and validation results.
+> Load and apply `ponytail` at ultra intensity. Fix only the reported findings with the smallest correct change. Keep work-item requirements and `<standards-docs>` binding. Run focused checks and pass `<validation-contract>` before handoff. Commit the fixes separately on the work branch and return the commit SHA, finding-by-finding evidence, changed-file accounting, and validation results.
 
 Any subsequent work-item change invalidates both review results, including remediation, additional edits, and fixes during final verification or publication. Commit the changes separately, then restart this section from Ponytail review with fresh review subagents against the full work-item diff.
 
@@ -88,7 +88,8 @@ After the review gate in section 4 passes:
 3. Confirm the section 4 review gate still passes, then push the work branch to the repository remote.
 4. Open a draft pull request through the repository host's native mechanism, targeting `<base-branch>` from the work branch.
 5. Use the commit subject format for the pull-request title. Limit the body to a `Summary` of 1–3 short sentences: lead with why the change is needed, then explain the key decision and its rationale. Add a native ticket link for tracked work. Omit change inventories, validation sections, and review sections.
-6. **Tracked tickets only:** after draft pull-request creation succeeds, keep `<executor>` assigned and transition the ticket to `<review-handoff-state>` through the tracker's native lifecycle mechanism.
+6. **Visual changes only:** when the diff changes what users see and the environment can render it, capture a screenshot of the changed UI at final `HEAD` and embed it in the body below the Summary. Upload it through the host's native image attachment so it stays out of the work branch; when no upload path is available, give its local path in the completion report.
+7. **Tracked tickets only:** after draft pull-request creation succeeds, keep `<executor>` assigned and transition the ticket to `<review-handoff-state>` through the tracker's native lifecycle mechanism.
 
 Keep the pull request in draft. Do not merge it. If push, pull-request creation, or an applicable final tracker transition fails, preserve completed state, report the exact failure and retry point, then stop.
 
@@ -96,4 +97,4 @@ Keep the pull request in draft. Do not merge it. If push, pull-request creation,
 
 Declare completion only when every work-item requirement has evidence, the full validation workflow passes at final `HEAD`, the worktree is accounted for, the section 4 review gate passes at final `HEAD`, every work-item commit is pushed, the pull request is open in draft against `<base-branch>`, and, for tracked tickets, the ticket remains assigned to `<executor>` in `<review-handoff-state>`.
 
-Report the work item, branch, commit range, validation results, both review results, and draft pull-request link. Include executor and tracker transitions only for tracked tickets.
+Report the work item, branch, commit range, validation results, both review results, draft pull-request link, and, for visual changes, the screenshot or its local path. Include executor and tracker transitions only for tracked tickets.

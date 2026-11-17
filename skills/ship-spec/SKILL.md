@@ -65,7 +65,9 @@ When either group has missing skills, report all relevant setup actions together
 
 Check the repository-local instructions and `docs/agents/` configuration required by `setup-matt-pocock-skills`. If setup is missing or inconsistent, load and follow `setup-matt-pocock-skills` completely. Finish its user-confirmed setup before continuing.
 
-Pass this gate only when the repository instruction file contains its `## Agent skills` configuration and the referenced issue-tracker, triage-label, and domain files exist and agree with it.
+Record every coding-standards and architecture doc the repository keeps as `<standards-docs>`: files such as `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md`, ADRs, and docs the repository instructions point to; an empty list is valid.
+
+Pass this gate only when the repository instruction file contains its `## Agent skills` configuration, the referenced issue-tracker, triage-label, and domain files exist and agree with it, and `<standards-docs>` is recorded.
 
 ## 3. Pin the work and open the spec branch
 
@@ -98,7 +100,7 @@ Work one ready work item at a time. A work item is a child ticket or, when no ch
 
 Define `<ponytail-contract>` once and include it verbatim in every implementation, remediation, work-item review, and final-review subagent prompt.
 
-> Load and apply `ponytail` at `ultra` intensity. Treat the spec, acceptance criteria, repository standards, deep-module boundaries, approved testing seam, validation, error handling, security, and accessibility as binding constraints. Minimize the implementation within those constraints. Report ultra pushback in the return and keep every binding constraint. Account for every changed file and new abstraction.
+> Load and apply `ponytail` at `ultra` intensity. Treat the spec, acceptance criteria, `<standards-docs>`, deep-module boundaries, approved testing seam, validation, error handling, security, and accessibility as binding constraints. Minimize the implementation within those constraints. Report ultra pushback in the return and keep every binding constraint. Account for every changed file and new abstraction.
 
 Define `<ponytail-review-gate>` once and include it verbatim in every work-item and final-review subagent prompt.
 
@@ -141,7 +143,7 @@ When exhaustive child discovery is empty and the parent spec is the work item, p
 
 For a child-ticket work item, spawn a different fresh review subagent with `<work-item-base>`, the work item, the parent spec, repository instructions, and this brief:
 
-> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<work-item-base>...HEAD`. Use the child ticket as the immediate spec and apply all inherited parent-spec decisions. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting.
+> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<work-item-base>...HEAD`, with every `<standards-docs>` file among `code-review`'s Standards sources. Use the child ticket as the immediate spec and apply all inherited parent-spec decisions. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting.
 
 Treat documented-standard violations and missing, partial, wrong, or unrequested spec behavior as blocking. Evaluate each baseline smell; fix it or record a concrete reason it is acceptable.
 
@@ -153,7 +155,7 @@ After `<work-item-completion-gate>` passes, mark the child ticket technically co
 
 Spawn a fresh final review subagent with `<spec-base>`, the full parent spec, every child ticket when present, repository instructions, and this brief:
 
-> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting. This is the whole-spec release gate.
+> Load and apply `code-review`, `ponytail`, and `ponytail-review`. Apply `<ponytail-contract>` and `<ponytail-review-gate>`. Review `<spec-base>...HEAD` against the parent spec and all child tickets when present, with every `<standards-docs>` file among `code-review`'s Standards sources. Return Standards, Spec, and Ponytail separately, plus exact actionable findings and Ponytail accounting. This is the whole-spec release gate.
 
 For blocking findings, spawn a fresh implementation subagent using `implement`, `codebase-design`, and `ponytail`. Apply `<ponytail-contract>` and `<commit-contract>`, commit focused fixes separately with the parent spec reference, pass `<validation-contract>`, and spawn another fresh final review subagent using `code-review`, `ponytail`, and `ponytail-review` from `<spec-base>`. Repeat until Standards, Spec, and `<ponytail-review-gate>` pass.
 
@@ -167,7 +169,8 @@ After the whole-spec review passes:
 2. Push `<spec-branch>` to the repository remote.
 3. Create a draft pull request through the repository host's native mechanism with `<base-branch>` as base and `<spec-branch>` as head. Leave it in draft state.
 4. Format the pull-request title with the subject format defined by `<commit-contract>`, summarizing the whole parent spec. Limit the body to a `Summary` of 1–3 short sentences: lead with why the change is needed, then explain the key decision and its rationale. Add native links to the parent spec and every child ticket. Omit change inventories, validation sections, and review sections. Add native issue or development relationships when the host supports them. Link every issue without relying only on prose titles.
-5. After pull-request creation succeeds, transition the parent spec to its `<review-handoff-state>` and keep `<tracker-user>` assigned. Reconcile every child ticket to its `<review-handoff-state>` and assigned to `<tracker-user>`.
+5. **Visual changes only:** when the diff changes what users see and the environment can render it, capture a screenshot of the changed UI at final `HEAD` and embed it in the body below the Summary. Upload it through the host's native image attachment so it stays out of `<spec-branch>`; when no upload path is available, give its local path in the completion report.
+6. After pull-request creation succeeds, transition the parent spec to its `<review-handoff-state>` and keep `<tracker-user>` assigned. Reconcile every child ticket to its `<review-handoff-state>` and assigned to `<tracker-user>`.
 
 Keep the parent spec In Progress when branch push or pull-request creation fails. Preserve commits and report the exact retry point.
 
@@ -185,4 +188,4 @@ Declare completion only when all conditions hold:
 - the parent spec and every child ticket are assigned to `<tracker-user>` and transitioned to their `<review-handoff-state>` through the tracker-native lifecycle mechanism;
 - the pull-request title satisfies the subject format defined by `<commit-contract>`, and the pull request remains a draft, targets `<base-branch>` from `<spec-branch>`, and links the parent spec plus every child ticket.
 
-Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final validation results, final review outcome, and pull-request link. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.
+Apply `<terse-output-contract>` to the completion report. Include the parent spec, completed work items, tracker transitions, assignee, branch, commit range by work item, final validation results, final review outcome, pull-request link, and, for visual changes, the screenshot or its local path. External blockers pause completion: preserve state, report the exact blocker, attempted remedies, and retry point, obtain the smallest needed input, then resume this process.
